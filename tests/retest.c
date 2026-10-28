@@ -1285,6 +1285,19 @@ main(int argc, char **argv)
   test_exec("ababc", REG_NOTBOL, REG_NOMATCH);
   test_exec("abxc", 0, REG_NOMATCH);
 
+  /* Matching resumes at the next character that can start a match. */
+  test_comp("(\\.|^)ab\\.c$", REG_EXTENDED, 0);
+  test_exec("ab.c", 0, REG_OK, 0, 4, 0, 0, END);
+  test_exec("x.ab.c", 0, REG_OK, 1, 6, 1, 2, END);
+  test_exec("xab.c", 0, REG_NOMATCH);
+  test_comp("(\\.|^)ab$", REG_EXTENDED, 0);
+  test_nexec("x.ab", 3, 0, REG_NOMATCH);
+  test_comp("\\<ab", REG_EXTENDED, 0);
+  test_exec("xab ab", 0, REG_OK, 4, 6, END);
+  test_comp("b+c", REG_EXTENDED, 0);
+  test_exec("abbbc", 0, REG_OK, 1, 5, END);
+  test_exec("abab", 0, REG_NOMATCH);
+
   /* With BRE syntax, `^' has a special meaning only at the beginning of the
      RE or the beginning of a parenthesized subexpression. */
   test_comp("a\\{0,1\\}^bc", 0, 0);
